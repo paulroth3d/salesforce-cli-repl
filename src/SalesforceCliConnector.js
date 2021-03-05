@@ -22,7 +22,7 @@ const ERROR_LEVEL_NONE = -1;
 const ERROR_LEVEL_BASIC = 0;
 
 /** Error level: Detail @type {Number} */
-const ERROR_LEVEL_DETAIL = 1;
+const ERROR_LEVEL_DETAIL = 1; // eslint-disable-line no-unused-vars
 
 /**
  * A result from within Org Detail
@@ -80,7 +80,7 @@ class DeveloperError {
    */
   static importError(err) {
     if (err instanceof DeveloperError) {
-      return(err);
+      return (err);
     }
     return new DeveloperError(err.message, 'unhandled exception', err.stack);
   }
@@ -115,7 +115,7 @@ class SalesforceCliConnector {
   /**
    * Flags to send for the connector
    * @public
-   * @param {Object} options 
+   * @param {Object} options -
    */
   setOptions(options) {
     const defaults = {
@@ -123,7 +123,7 @@ class SalesforceCliConnector {
     };
 
     //-- check environment variables
-    if (process.env.hasOwnProperty('TRACE_LEVEL')) {
+    if (process.env.hasOwnProperty('TRACE_LEVEL')) { // eslint-disable-line no-prototype-builtins
       const envTraceLevel = Number.parseInt(process.env.TRACE_LEVEL, 10);
       if (Number.isSafeInteger(envTraceLevel)) {
         defaults.traceLevel = envTraceLevel;
@@ -148,7 +148,7 @@ class SalesforceCliConnector {
    */
   async getConnection(alias) {
     let self = this;
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async (resolve, reject) => { // eslint-disable-line no-async-promise-executor, no-unused-vars
       try {
         /** @type {OrgDetailResult} */
         const connectionInfo = await self.getConnectionDetail(alias);
@@ -156,7 +156,7 @@ class SalesforceCliConnector {
         resolve(new JsForce.Connection({
           serverUrl: connectionInfo.instanceUrl,
           sessionId: connectionInfo.accessToken
-        }));
+        })); // eslint-disable-line padded-blocks
 
       } catch (err) {
         const cleanedErr = DeveloperError.importError(err);
@@ -176,20 +176,24 @@ class SalesforceCliConnector {
    */
   async getConnectionDetail(alias) {
     const self = this;
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async (resolve, reject) => { // eslint-disable-line no-async-promise-executor
       let conn;
       /** @type {OrgDetail} */
       let connObj;
 
       try {
         conn = await self.getOrgDetail(alias);
-      } catch(err) {
+      } catch (err) {
         return reject(err);
+      }
+
+      if (self.traceLevel > ERROR_LEVEL_BASIC) {
+        logger.info('captured result: %o', conn);
       }
 
       try {
         connObj = JSON.parse(conn);
-      } catch(err) {
+      } catch (err) {
         return reject(new DeveloperError(
           `Unable to get connection:${alias || 'default'}`,
           err.message,
@@ -234,7 +238,7 @@ class SalesforceCliConnector {
       const proc = childProcess.spawn('sfdx', args, options);
 
       //-- its done
-      proc.stdout.on('close', (code) => {
+      proc.stdout.on('close', (code) => { // eslint-disable-line no-unused-vars
         // console.log(`completed with exit code ${code}`);
         if (streamError) {
           return reject(new DeveloperError(
@@ -248,18 +252,18 @@ class SalesforceCliConnector {
 
       //-- normal std out
       proc.stdout.on('data', (data) => {
-        console.log('err:' + data.toString());
+        // console.log('err:' + data.toString());
         results += data.toString();
       });
 
       //-- error
       proc.stderr.on('data', (data) => {
-        console.log('dat:' + data.toString());
+        // console.log('dat:' + data.toString());
         results += data.toString();
       });
 
       proc.on('error', (err) => {
-        console.error('error occurred');
+        // console.error('error occurred');
         streamError = err;
       });
     });
@@ -279,9 +283,9 @@ class SalesforceCliConnector {
     }
 
     try {
-      const result = fs.readJsonSync(resolvedPath, {encoding:'utf-8'});
+      const result = fs.readJsonSync(resolvedPath, { encoding: 'utf-8' });
       return result;
-    } catch(err) {
+    } catch (err) {
       (new DeveloperError(
         `unable to read file: ${resolvedPath}`,
         err.message,
@@ -301,10 +305,10 @@ class SalesforceCliConnector {
 
     // const resolvedPath = path.resolve(filePath);
     try {
-      fs.writeFileSync(filePath, jsonContents, {encoding:'utf-8'});
-    } catch(err) {
+      fs.writeFileSync(filePath, jsonContents, { encoding: 'utf-8' });
+    } catch (err) {
       (new DeveloperError(
-        `unable to write to file: ${resolvedPath}`,
+        `unable to write to file: ${filePath}`,
         err.message,
         err.stack
       )).log(this.traceLevel);
@@ -313,25 +317,25 @@ class SalesforceCliConnector {
 
   /**
    * Converts a jsForce function to a promise
-   * @private - 
+   * @private -
    * @example
    * const accountDescribe = await CliConnection.promisify(conn.describeSObject)('Account');
    * @param {Function} fn - the function to promisify
    * @returns {Function} - a wrapper for function, that when executed, the last argument will be a promise callback
    */
   promisify(fn) {
-    return (...args) => {
+    return (...args) => { // eslint-disable-line arrow-body-style
       return new Promise((resolve, reject) => {
         function customCallback(err, ...results) {
           if (err) {
             return reject(err);
           }
-          resolve.apply(this, results);
+          return resolve.apply(this, results);
         }
         args.push(customCallback);
         fn.apply(this, args);
       });
-    }
+    };
   }
 }
 
