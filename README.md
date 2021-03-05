@@ -27,13 +27,24 @@ let allAccountPicklistFields = await conn.describeSObject('Account').fields
 * You can get a clear list of all fields
 
 ```
-let fieldList['Account'] = accountDescribe
+let allFields = accountDescribe
 	.map(({name, label}) => ({name, label});
 
+```
+
+* then when you are all set, write the results
+
+```
+connector.writeJSON('./tmp/allFields.json', allFields);
+```
+
+* or read them back when you're ready
+
+```
+const allFieldsLoaded = connector.readFile('./tmp/allFields.json');
 ```
 
 # See Also
 
 * [JsForce](https://jsforce.github.io/document/)
 * [JsForce Web Console](https://jsforce.github.io/jsforce-web-console/)
-
