@@ -1,6 +1,6 @@
 {
   "name": "salesforce-cli-repl",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Simple project to make it easy to connect to salesforce over node REPL CLI.",
   "main": "src/SalesforceCliConnector.js",
   "scripts": {

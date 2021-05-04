@@ -295,6 +295,30 @@ class SalesforceCliConnector {
   }
 
   /**
+   * Reads a file in a text
+   * @param {String} filePath - path of the file to load
+   * @returns {String}
+   */
+  readFile(filePath) {
+    const resolvedPath = path.resolve(filePath);
+    if (!fs.existsSync(resolvedPath)) {
+      logger.error('File does not exist: %s', resolvedPath);
+      return;
+    }
+
+    try {
+      const result = fs.readFileSync(resolvedPath, { encoding: 'utf-8' });
+      return result;
+    } catch (err) {
+      (new DeveloperError(
+        `unable to read file: ${resolvedPath}`,
+        err.message,
+        err.stack
+      )).log(this.traceLevel);
+    }
+  }
+
+  /**
    * Writes to a file
    * @param {string} filePath - path of the file to write
    * @param {string} contents - contents of the file
@@ -309,6 +333,32 @@ class SalesforceCliConnector {
     } catch (err) {
       (new DeveloperError(
         `unable to write to file: ${filePath}`,
+        err.message,
+        err.stack
+      )).log(this.traceLevel);
+    }
+  }
+
+  /**
+   * List files in a directory
+   * @param {String} directoryPath - path of the directory to list
+   */
+  listFiles(directoryPath) {
+    const resolvedPath = path.resolve(directoryPath);
+    if (!fs.existsSync(resolvedPath)) {
+      logger.error('Path does not exist: %s', resolvedPath);
+      return;
+    } else if (fs.ensureDirSync(resolvedPath)) { // eslint-disable-line no-else-return
+      logger.error(`Path is not a directory:${resolvedPath}`);
+      return;
+    }
+
+    try {
+      let results = fs.readdirSync(resolvedPath);
+      return results;
+    } catch (err) {
+      (new DeveloperError(
+        `unable to read directory: ${resolvedPath}`,
         err.message,
         err.stack
       )).log(this.traceLevel);

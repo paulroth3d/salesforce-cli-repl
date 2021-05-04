@@ -35,13 +35,24 @@ let allFields = accountDescribe
 * then when you are all set, write the results
 
 ```
-connector.writeJSON('./tmp/allFields.json', allFields);
+// note that the `_` variable in nodejs repl is the last result
+connector.writeFile('./tmp/allFields.json', _ );
+// or explicitly specify the variable to write out
+connector.writeFile('./tmp/allFields.json', allFields);
 ```
 
 * or read them back when you're ready
 
 ```
-const allFieldsLoaded = connector.readFile('./tmp/allFields.json');
+// list files in the tmp directory
+connector.listFiles('./tmp/');
+// ['allFields.json', 'README.md']
+
+// read json
+const allFieldsLoaded = connector.readJSON('./tmp/allFields.json');
+
+// read plain text file
+const readme = connector.readFile('./tmp/README.md');
 ```
 
 # See Also
