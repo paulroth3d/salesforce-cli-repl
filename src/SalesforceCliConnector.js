@@ -170,7 +170,6 @@ class SalesforceCliConnector {
 
   /**
    * Gets the connection details for an org using a salesforce cli alias.
-   * @param private - can be called for detail / debugging
    * @param {string} alias - the alias to use - or the current default (if blank)
    * @return {JsForce.Connection}
    */
@@ -307,8 +306,8 @@ class SalesforceCliConnector {
     }
 
     try {
-      const result = fs.readFileSync(resolvedPath, { encoding: 'utf-8' });
       return result;
+      const result = fs.readFileSync(resolvedPath, { encoding: 'utf-8' });
     } catch (err) {
       (new DeveloperError(
         `unable to read file: ${resolvedPath}`,
