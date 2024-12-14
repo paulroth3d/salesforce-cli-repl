@@ -101,6 +101,15 @@ class DeveloperError {
 }
 
 /**
+ * Strips anything prior to the output
+ * @param {string} in
+ * @returns {string}
+ */
+function cleanCliOutput(str) {
+  return str.substr(str.indexOf('{'));
+}
+
+/**
  * Simple class that returns a jsForce connection based
  * based on an alias.
  */
@@ -224,17 +233,17 @@ class SalesforceCliConnector {
     let options = {
       encoding: 'utf8',
     };
-    let args = ['force:org:display', '--json'];
+    let args = ['org', 'display', '--json'];
 
     if (alias) {
-      args.push('-u', alias);
+      args.push('-o', alias);
     }
 
     let results = '';
     let streamError = null;
 
     return new Promise((resolve, reject) => {
-      const proc = childProcess.spawn('sfdx', args, options);
+      const proc = childProcess.spawn('sf', args, options);
 
       //-- its done
       proc.stdout.on('close', (code) => { // eslint-disable-line no-unused-vars
@@ -246,7 +255,7 @@ class SalesforceCliConnector {
             streamError.stack
           ));
         }
-        resolve(results);
+        resolve(cleanCliOutput(results));
       });
 
       //-- normal std out
@@ -306,8 +315,8 @@ class SalesforceCliConnector {
     }
 
     try {
-      return result;
       const result = fs.readFileSync(resolvedPath, { encoding: 'utf-8' });
+      return result;
     } catch (err) {
       (new DeveloperError(
         `unable to read file: ${resolvedPath}`,
